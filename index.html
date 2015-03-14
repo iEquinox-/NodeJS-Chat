@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<head>
+	<title>Chat</title>
+	<style>
+		body {
+			background: #111;
+			margin: 10px;
+		}
+
+		div#MessageBase {
+			padding: 10px;
+			background: #333;
+			border-radius: 3px;
+			border:1px solid #333;
+		}
+
+		div#MessageBase > ul.messages > li {
+			display: block;
+			border-bottom: 1px solid #111;
+			padding: 10px;
+			font-family: monospace;
+			color: #FFF;
+		}
+
+		div#setUser {
+			z-index: 999;
+			position: fixed;
+			top: 0; left: 0;
+			height: 100%; width: 100%;
+			background: rgba(0,0,0,0.65);
+			text-align: center;
+		}
+
+		div#setUser * {
+			font-family: monospace;
+			color: #FFF;
+			outline: none;
+		}
+
+		div#setUser div {
+			margin-top: 150px;
+			font-size: 18px;
+		}
+
+		div#setUser input {
+			background: #888;
+			padding: 10px;
+			color: #111;
+			border: 1px solid #888;
+			border-radius: 3px;
+			font-family: monospace;
+		}
+		
+		div.usercount {
+			font-family: monospace;
+			color: #888;
+		}
+		
+		div#MessageBase>form input[type='text'] {
+			border: 1px solid #111;
+			padding: 10px;
+			background: transparent;
+			border-radius: 3px;
+			outline: none;
+			font-family: monospace;
+			color: #888;
+			width: 100%;
+		}
+		
+		div#MessageBase>form input[type='submit'] {
+			border: 1px solid #111;
+			padding: 10px;
+			border-radius: 3px;
+			background: transparent;
+			color: #888;
+			width: 100%;
+		}
+	</style>
+</head>
+<body>
+	<div id="setUser">
+		<div class="message">Please set your username.</div><br/>
+		<form class="doUser">
+			<input type="text" placeholder="Username" class="SetUsername">
+			<input type="submit" value="Submit" class="Subm">
+		</form>
+	</div>
+	<div id="MessageBase">
+		<div class="usercount">0 users active.</div>
+		<ul class="messages" style="padding:0;border:1px solid #111;border-radius:3px;margin:10px 3px;height:305px;overflow-y: scroll;"></ul>
+		<form>
+			<table style="width: 100%;">
+				<tbody>
+					<tr>
+						<td style="width:85%;padding-right:10px;"><input type="text" placeholder="Type here..."></td>
+						<td style="padding-left: 15px;"><input type="submit" value="Send"></td>
+					</tr>
+				</tbody>
+			</table>
+		</form>
+	</div>
+	<script src="https://cdn.socket.io/socket.io-1.3.4.js"></script>
+	<script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+	<script>
+		var socket = io(),
+			username;
+		function Send(message){
+			socket.emit('_Message', {Username:username, Message:message});
+		}
+		
+		$("div#setUser>form").submit(function(event){
+			event.preventDefault();
+			if($(this).children(".SetUsername").val().length > 0){
+				username = $(this).children(".SetUsername").val();
+				socket.emit('_SetUser', username);
+				socket.on('_Return', function(data){
+					if(data == false){
+						alert('That username is already taken at this time, please choose another.');
+					} else {
+						$("div#setUser").fadeOut(500);
+						setTimeout(function(){
+							$("div#setUser").remove();
+						},500);
+					}
+				});
+			}
+		});
+		
+		$("div#MessageBase>form").submit(function(event){
+			event.preventDefault();
+			if( $("div#MessageBase>form input[type='text']").val().length > 0 ) {
+				socket.emit('_Message', {Username:username, Message:$("div#MessageBase>form input[type='text']").val()});
+				$("div#MessageBase>form input[type='text']").val("");
+			}
+		});
+		
+		socket.on('recountUsers', function(data) {
+			$("div.usercount").text(data + " users active.");
+		});
+		
+		socket.on('_Message', function(data) {
+			$("ul.messages").append("<li>"+data.Username + ": " + data.Message+"</li>");
+		});
+	</script>
+</body>
