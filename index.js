@@ -1,3 +1,4 @@
+var Settings = require('./configuration.json');
 var fs = require('fs'),
 	ps = require('child_process'),
 	http = require('http').createServer(function (req,res){
@@ -6,18 +7,11 @@ var fs = require('fs'),
 			res.write(data);
 			res.end();
 		});	
-	}).listen(3000,'127.0.0.1');
+	}).listen(Settings.Config.port,Settings.Config.addr);
 var io = require('socket.io')(http),
-	usernames = [],
+	usernames = [Settings.Botsettings.Botuser],
 	users = 0,
 	open  = {};
-	
-var Settings = {
-		Botsettings: {
-			Botuser: "Intellect",
-			Botstyle: "color:#EC2F9A;"
-		}
-	}
 
 io.on('connection', function(socket){
 	users += 1;
