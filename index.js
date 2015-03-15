@@ -1,4 +1,4 @@
-var Settings = require('./configuration.json');
+var Settings = require('./files/configuration.json');
 var fs = require('fs'),
 	ps = require('child_process'),
 	http = require('http').createServer(function (req,res){
