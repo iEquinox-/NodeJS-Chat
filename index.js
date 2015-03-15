@@ -31,7 +31,7 @@ io.on('connection', function(socket){
 	});
 	
 	socket.on('_Command', function(data){
-		ps.spawn('python', [__dirname+'/bot.py', data]).stdout.on('data', function(rdata) {
+		ps.spawn('python', [__dirname+'/files/bot.py', data]).stdout.on('data', function(rdata) {
 			open[socket.id].emit('_CMDReturn', {BOTname: "<span style=\""+Settings.Botsettings.Botstyle+"\">"+Settings.Botsettings.Botuser+"</span>", Data: rdata.toString('utf8')});
 		});
 	});
