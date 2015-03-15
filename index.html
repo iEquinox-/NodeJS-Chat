@@ -129,7 +129,11 @@
 		$("div#MessageBase>form").submit(function(event){
 			event.preventDefault();
 			if( $("div#MessageBase>form input[type='text']").val().length > 0 ) {
-				socket.emit('_Message', {Username:username, Message:$("div#MessageBase>form input[type='text']").val()});
+				if($("div#MessageBase>form input[type='text']").val().substring(0,1) == "/") {
+					socket.emit('_Command', $("div#MessageBase>form input[type='text']").val().substring(1));
+				} else {
+					socket.emit('_Message', {Username:username, Message:$("div#MessageBase>form input[type='text']").val()});
+				}
 				$("div#MessageBase>form input[type='text']").val("");
 			}
 		});
@@ -137,6 +141,10 @@
 		socket.on('recountUsers', function(data) {
 			$("div.usercount").text(data + " users active.");
 		});
+		
+		socket.on('_CMDReturn', function(data){ 
+			$("ul.messages").append("<li>"+data.BOTname+": " + data.Data +"</li>");
+		})
 		
 		socket.on('_Message', function(data) {
 			$("ul.messages").append("<li>"+data.Username + ": " + data.Message+"</li>");
