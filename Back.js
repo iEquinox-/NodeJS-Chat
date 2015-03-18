@@ -1,21 +1,13 @@
 var Express = require('express')(),
 	HttpServer = require('http').Server(Express),
-	Term = require('child_process'),
+	Term = require('child_process').spawn,
 	Settings = require('./package.json').settings;
-
-function Python(action, argv) {
-	Term.spawn('python', [
-			__dirname + '/files/process.py',
-			action,
-			argv
-		]).stdout.on('data', function(response){
-			return response;
-		});
-}
 
 Express.get('/', function(request, response){
 	response.sendFile(__dirname+'/files/index.html');
-	Python('ret', 'test')
+	Term('python', [__dirname + '/files/process.py','test','action']).stdout.on('data', function(response){
+		console.log( response.toString('utf8') );
+	});
 });
 
 HttpServer.listen(Settings.port, function(){
