@@ -8,6 +8,10 @@
   },
   "settings": {
   	"port": 3000,
-  	"usebot": true
+  	"usebot": true,
+  	"bot": {
+  		"username": "Chatbot",
+  		"style": ""
+  	}
   }
 }
